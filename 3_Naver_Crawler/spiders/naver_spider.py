@@ -3,36 +3,45 @@ import re
 from naver_crawler.items import NaverCrawlerItem
 from datetime import datetime
 from dateutil.relativedelta import  relativedelta
+
+##### news_office_cookie_list
+##### 2227 : 연합 인포맥스
+##### 1018 : E-daily
+##### 1001 : 연합뉴스 
+#각각의 언론사 별로 설정된 cookie를 request를 보낼때 변경해주며, 3번에 걸처 scraping 시행
 class NaverSpider(scrapy.Spider):
     name = "naver"
-#사용시 수정해야할 사항 : 시작날짜, 마지막 날짜, 미디어 설정(cookie)
     def start_requests(self):
         date1 = 0
         date2 = 0
-        time_start = datetime(2005,5,1) # 크롤링할 시작 날짜
-        last_year = 2017
-        #네이버 뉴스 페이지가 400이 한계-> 월별로 나눠서 검색하여 파싱한다
-        while True: # 17년도 까지만 크롤링 할 예정
+        start_time = datetime(2005,5,1) # start time
+        last_time = 2017
+        #네이버 뉴스 페이지가 400이 한계이므로 월별로 나눠서 검색하여 파싱한다
+        while True: # 17년도 까지만 크롤링 할 예
+        
 
             if date1 != 0:
                 date1 = date1 + relativedelta(months=1)
                 date2 = date1 + relativedelta(months=1, days=-1)
-                #날짜 format바꿈
+                #날짜 formating 변환
+                
                 ds = datetime.strftime(date1,'%Y.%m.%d')
                 de = datetime.strftime(date2,'%Y.%m.%d')
                 
-                #2006년 넘어가면 작업 중지
-                if date1.year == last_year+1:
+                #2017년 넘어가면 작업 중지
+                if date1.year == last_time+1:
                     break
             else : 
-                date1 = time_start
+                date1 = start_time
                 date2 = date1 + relativedelta(months=1, days=-1)
                 ds = datetime.strftime(date1,'%Y.%m.%d')
                 de = datetime.strftime(date2,'%Y.%m.%d')
 
 
             url_org = 'https://search.naver.com/search.naver?where=news&query=%EA%B8%88%EB%A6%AC&sm=tab_opt&sort=2&mynews=1&pd=3&ds={}&de={}'.format(ds, de)
-            yield scrapy.Request(url=url_org, cookies={'news_office_checked': '2227'}, callback=self.parse_url_num)#,2227,1018,1001
+            
+            # 아래 request에서 cookies의 4자리 번호를 수정해가며 원하는 언론사의 뉴스 scrapy
+            yield scrapy.Request(url=url_org, cookies={'news_office_checked': '2227'}, callback=self.parse_url_num)
             #request에 cookie 추가
 
     def parse_url_num(self, response):
