@@ -12,30 +12,30 @@ from dateutil.relativedelta import  relativedelta
 class NaverSpider(scrapy.Spider):
     name = "naver"
     def start_requests(self):
-        date1 = 0
-        date2 = 0
+        startdate = 0
+        enddate = 0
         start_time = datetime(2005,5,1) # start time
         last_time = 2017
         #네이버 뉴스 페이지가 400이 한계이므로 월별로 나눠서 검색하여 파싱한다
         while True: # 17년도 까지만 크롤링 할 예
         
 
-            if date1 != 0:
-                date1 = date1 + relativedelta(months=1)
-                date2 = date1 + relativedelta(months=1, days=-1)
+            if startdate != 0:
+                startdate = startdate + relativedelta(months=1)
+                enddate = startdate + relativedelta(months=1, days=-1)
                 #날짜 formating 변환
                 
-                ds = datetime.strftime(date1,'%Y.%m.%d')
-                de = datetime.strftime(date2,'%Y.%m.%d')
+                ds = datetime.strftime(startdate,'%Y.%m.%d')
+                de = datetime.strftime(enddate,'%Y.%m.%d')
                 
                 #2017년 넘어가면 작업 중지
-                if date1.year == last_time+1:
+                if startdate.year == last_time+1:
                     break
             else : 
-                date1 = start_time
-                date2 = date1 + relativedelta(months=1, days=-1)
-                ds = datetime.strftime(date1,'%Y.%m.%d')
-                de = datetime.strftime(date2,'%Y.%m.%d')
+                startdate = start_time
+                enddate = startdate + relativedelta(months=1, days=-1)
+                ds = datetime.strftime(startdate,'%Y.%m.%d')
+                de = datetime.strftime(enddate,'%Y.%m.%d')
 
 
             url_org = 'https://search.naver.com/search.naver?where=news&query=%EA%B8%88%EB%A6%AC&sm=tab_opt&sort=2&mynews=1&pd=3&ds={}&de={}'.format(ds, de)
